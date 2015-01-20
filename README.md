@@ -1,5 +1,5 @@
 # NOVA BLINKY
-![](https://github.com/NovaBlinky/NovaBlinky/blob/master/hardware/RevA/BlinkyRevATransBG.png "Logo Title Text 1") 
+![](https://github.com/NovaBlinky/NovaBlinky/blob/master/hardware/RevA/BlinkyRevATrans.gif "Logo Title Text 1") 
 
 
 Nova Blinky is a single-board microcontroller system designed by, and for, The *Nova Labs* maker space in Reston, Virginia. It is designed to be used in introductory hardware and sofware classes.
