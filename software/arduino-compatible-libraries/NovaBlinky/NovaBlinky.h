@@ -1,5 +1,5 @@
 /*
- NovaBlinky Library Functions
+  NovaBlinky Library Functions
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -22,17 +22,27 @@
 
 #include "Arduino.h"
 
-#define BLINKY_NUMBER_OF_LEDS 12
+#define MaxLeds 12 // number of leds around the face
+
+#define buttonA 5 // pin number of left button
+#define buttonB 4 // pin number of right button
 
 class NovaBlinky
 {
   public:
-    void setup(void);
-    void basic_blinky_loop(void);
-    static const unsigned char max_leds;
-    static const unsigned char led_to_pin_map[BLINKY_NUMBER_OF_LEDS] ;
-    static unsigned char cur_led;
-    static unsigned char led_states[BLINKY_NUMBER_OF_LEDS];
+    void begin(void);
+    void basicBlinkyLoop(void);
+    void basicBlinkyLoop(boolean);
+    void setIndicatorLights(byte);
+    void updateLights(void);
+    void setLights(boolean);
+    void setLights(boolean,boolean);
+    void setLights(boolean,boolean,boolean);
+    //static const unsigned char maxLeds;
+    static const unsigned char pinMap[MaxLeds];
+    static unsigned char ledStates[MaxLeds];
+  private:
+    unsigned char _curled;
 };
 
 #endif // NovaBlinky_h
