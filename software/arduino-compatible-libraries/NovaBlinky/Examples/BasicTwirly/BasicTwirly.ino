@@ -5,12 +5,11 @@
 NovaBlinky nb;
 
 void setup() {        
-   nb.setup();  // setup blinky hardware
+  nb.begin();  // setup blinky hardware
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
-  nb.basic_blinky_loop(); // call basic clockwise twirly loop
-  delay(10); // sets the speed
-
+  nb.basicBlinkyLoop(); // call basic clockwise twirly loop
+  delay(45); // sets the speed
 }
