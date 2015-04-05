@@ -23,39 +23,73 @@
 #include "NovaBlinky.h"
 #include "Arduino.h"
 
-const unsigned char NovaBlinky::max_leds = 12; // number of leds around the face
+// this part seems a little repetitive...
+//const unsigned char NovaBlinky::maxLeds = MaxLeds; // number of leds around the face
 
-const unsigned char NovaBlinky::led_to_pin_map[] =
-{23,22,21,20,19,18,8,9,10,11,6,7};
+const unsigned char NovaBlinky::pinMap[] =
+{23,22,21,20,19,18,8,9,10,11,6,7}; // relation between led numbers and pin numbers
 
-unsigned char NovaBlinky::cur_led = 0;
-unsigned char NovaBlinky::led_states[] = {1,1,1,1,1,1,1,1,1,1,1,1};
+unsigned char NovaBlinky::ledStates[] = {1,1,1,1,1,1,1,1,1,1,1,1};
 
-void NovaBlinky::setup(void)
+// call once to initialize Blinky hardware:
+void NovaBlinky::begin(void)
 {
-  // call once to initialize Blinky hardware
-  int i;
-  for (i=0; i<max_leds; i++)
-  {
-    pinMode(led_to_pin_map[i],OUTPUT); // program pins for output
+  for(int i=0; i<MaxLeds; i++) {
+    pinMode(pinMap[i], OUTPUT); // program pin for output
+    digitalWrite(pinMap[i], HIGH); // turn off led
+  }
+  pinMode(buttonA, INPUT); pinMode(buttonB, INPUT); //configure button pin-modes
+  digitalWrite(buttonA, HIGH); digitalWrite(buttonB, HIGH); //enable button pullups
+}
+
+// run an LED update based on the contents of ledStates:
+void NovaBlinky::updateLights(void)
+{
+  for(int i=0; i<MaxLeds; i++) { // loop though all LED pins
+    digitalWrite(pinMap[i], ledStates[i]); // set LED to value saved in ledStates table
   }
 }
 
-void NovaBlinky::basic_blinky_loop(void)
+// turn all lights on or off:
+void NovaBlinky::setLights(boolean onOff)
 {
-  // traditionally called from loop(), do things that regularly need to be done
-  // on Blinky
-  led_states[cur_led] = 1; // curled gets turned off
+  setLights(onOff, true, false);
+}
+void NovaBlinky::setLights(boolean onOff, boolean captureChange)
+{
+  setLights(onOff, captureChange, false);
+}
+void NovaBlinky::setLights(boolean onOff, boolean captureChange, boolean skipUpdate)
+{
+    if(captureChange) {
+        for(int i=0; i<MaxLeds; i++) ledStates[i] = !onOff;
+        setIndicatorLights(0); if(!skipUpdate) updateLights();
+    } else if(!skipUpdate) {
+        for(int i=0; i<MaxLeds; i++) digitalWrite(pinMap[i], !onOff);
+    }
+}
 
-  if (++cur_led >= max_leds) // reset current led on wrap
-    cur_led = 0;
+// control the board's RX and TX lights: (this little hack only works on the Arduino Leonardo)
+void NovaBlinky::setIndicatorLights(byte status)
+{
+  if(status == 1) { RXLED1; TXLED0; }
+  else if(status == 2) { RXLED0; TXLED1; }
+  else if(status == 3) { RXLED1; TXLED1; }
+  else { RXLED0; TXLED0; }
+}
 
-  led_states[cur_led] = 0; // next led gets turned on
-
-  int i;
-
-  for (i=0; i<max_leds; i++)   // update state of all leds
-  {
-    digitalWrite(led_to_pin_map[i],led_states[i]);
-  }
+// call periodically in loop() to create a light-casing pattern:
+void NovaBlinky::basicBlinkyLoop(void)
+{
+  basicBlinkyLoop(true);
+}
+void NovaBlinky::basicBlinkyLoop(boolean dir)
+{
+  ledStates[_curled] = 0; // currled gets turned on so it can be displayed
+  updateLights(); // update light ring
+  ledStates[_curled] = 1; // currled gets turned off in preperaton for next loop
+  
+  // loop when last led is reached:
+  if(_curled == (dir ? (MaxLeds - 1) : 0)) _curled = dir ? 0 : (MaxLeds - 1);
+  else _curled = _curled + (dir ? 1 : -1);
 }
